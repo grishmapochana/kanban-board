@@ -2,7 +2,6 @@
 import { useState } from "react";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -10,12 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  useUpdateColumnMutation,
-  GetBoardDocument,
-  useGetBoardQuery,
-} from "@/gql/generated";
-import Edit from "./icons/Edit";
+import { useUpdateColumnMutation, GetBoardDocument } from "@/gql/generated";
 import { Edit2 } from "lucide-react";
 
 export function EditColumnDialog({

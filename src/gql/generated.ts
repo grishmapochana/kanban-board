@@ -15,13 +15,13 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
-  bigint: { input: any; output: any; }
-  bytea: { input: any; output: any; }
-  citext: { input: any; output: any; }
-  float8: { input: any; output: any; }
-  jsonb: { input: any; output: any; }
-  timestamptz: { input: any; output: any; }
-  uuid: { input: any; output: any; }
+  bigint: { input: string; output: string; }
+  bytea: { input: string; output: string; }
+  citext: { input: string; output: string; }
+  float8: { input: number; output: number; }
+  jsonb: { input: unknown; output: unknown; }
+  timestamptz: { input: string; output: string; }
+  uuid: { input: string; output: string; }
 };
 
 /** Boolean expression to compare columns of type "Boolean". All fields are combined with logical 'AND'. */
@@ -6945,14 +6945,14 @@ export type Virus_Updates = {
 export type GetBoardsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetBoardsQuery = { __typename?: 'query_root', boards: Array<{ __typename?: 'boards', id: any, name: string }> };
+export type GetBoardsQuery = { __typename?: 'query_root', boards: Array<{ __typename?: 'boards', id: string, name: string }> };
 
 export type GetBoardQueryVariables = Exact<{
   id: Scalars['uuid']['input'];
 }>;
 
 
-export type GetBoardQuery = { __typename?: 'query_root', boards: Array<{ __typename?: 'boards', id: any, name: string, columns: Array<{ __typename?: 'columns', id: any, name: string, position: any, cards: Array<{ __typename?: 'cards', id: any, name: string, position: any, user?: { __typename?: 'users', id: any, displayName: string, avatarUrl: string } | null }> }> }> };
+export type GetBoardQuery = { __typename?: 'query_root', boards: Array<{ __typename?: 'boards', id: string, name: string, columns: Array<{ __typename?: 'columns', id: string, name: string, position: number, cards: Array<{ __typename?: 'cards', id: string, name: string, position: number, user?: { __typename?: 'users', id: string, displayName: string, avatarUrl: string } | null }> }> }> };
 
 export type AddColumnMutationVariables = Exact<{
   board_id: Scalars['uuid']['input'];
@@ -6961,7 +6961,7 @@ export type AddColumnMutationVariables = Exact<{
 }>;
 
 
-export type AddColumnMutation = { __typename?: 'mutation_root', insert_columns_one?: { __typename?: 'columns', id: any, name: string, position: any } | null };
+export type AddColumnMutation = { __typename?: 'mutation_root', insert_columns_one?: { __typename?: 'columns', id: string, name: string, position: number } | null };
 
 export type UpdateColumnMutationVariables = Exact<{
   id: Scalars['uuid']['input'];
@@ -6969,14 +6969,14 @@ export type UpdateColumnMutationVariables = Exact<{
 }>;
 
 
-export type UpdateColumnMutation = { __typename?: 'mutation_root', update_columns_by_pk?: { __typename?: 'columns', id: any, name: string } | null };
+export type UpdateColumnMutation = { __typename?: 'mutation_root', update_columns_by_pk?: { __typename?: 'columns', id: string, name: string } | null };
 
 export type DeleteColumnMutationVariables = Exact<{
   id: Scalars['uuid']['input'];
 }>;
 
 
-export type DeleteColumnMutation = { __typename?: 'mutation_root', delete_columns_by_pk?: { __typename?: 'columns', id: any } | null };
+export type DeleteColumnMutation = { __typename?: 'mutation_root', delete_columns_by_pk?: { __typename?: 'columns', id: string } | null };
 
 export type UpdateColumnPositionMutationVariables = Exact<{
   id: Scalars['uuid']['input'];
@@ -6984,12 +6984,12 @@ export type UpdateColumnPositionMutationVariables = Exact<{
 }>;
 
 
-export type UpdateColumnPositionMutation = { __typename?: 'mutation_root', update_columns_by_pk?: { __typename?: 'columns', id: any, position: any } | null };
+export type UpdateColumnPositionMutation = { __typename?: 'mutation_root', update_columns_by_pk?: { __typename?: 'columns', id: string, position: number } | null };
 
 export type GetUsersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetUsersQuery = { __typename?: 'query_root', users: Array<{ __typename?: 'users', id: any, displayName: string }> };
+export type GetUsersQuery = { __typename?: 'query_root', users: Array<{ __typename?: 'users', id: string, displayName: string, avatarUrl: string }> };
 
 export type CreateCardMutationVariables = Exact<{
   columnId: Scalars['uuid']['input'];
@@ -6999,7 +6999,7 @@ export type CreateCardMutationVariables = Exact<{
 }>;
 
 
-export type CreateCardMutation = { __typename?: 'mutation_root', insert_cards_one?: { __typename?: 'cards', id: any, name: string, position: any, user_id?: any | null } | null };
+export type CreateCardMutation = { __typename?: 'mutation_root', insert_cards_one?: { __typename?: 'cards', id: string, name: string, position: number, user_id?: string | null } | null };
 
 export type UpdateCardPositionMutationVariables = Exact<{
   id: Scalars['uuid']['input'];
@@ -7008,7 +7008,7 @@ export type UpdateCardPositionMutationVariables = Exact<{
 }>;
 
 
-export type UpdateCardPositionMutation = { __typename?: 'mutation_root', update_cards_by_pk?: { __typename?: 'cards', id: any, position: any, column_id?: any | null } | null };
+export type UpdateCardPositionMutation = { __typename?: 'mutation_root', update_cards_by_pk?: { __typename?: 'cards', id: string, position: number, column_id?: string | null } | null };
 
 export type UpdateCardMutationVariables = Exact<{
   id: Scalars['uuid']['input'];
@@ -7017,14 +7017,14 @@ export type UpdateCardMutationVariables = Exact<{
 }>;
 
 
-export type UpdateCardMutation = { __typename?: 'mutation_root', update_cards_by_pk?: { __typename?: 'cards', id: any, name: string, user_id?: any | null } | null };
+export type UpdateCardMutation = { __typename?: 'mutation_root', update_cards_by_pk?: { __typename?: 'cards', id: string, name: string, user_id?: string | null } | null };
 
 export type DeleteCardMutationVariables = Exact<{
   id: Scalars['uuid']['input'];
 }>;
 
 
-export type DeleteCardMutation = { __typename?: 'mutation_root', delete_cards_by_pk?: { __typename?: 'cards', id: any } | null };
+export type DeleteCardMutation = { __typename?: 'mutation_root', delete_cards_by_pk?: { __typename?: 'cards', id: string } | null };
 
 
 export const GetBoardsDocument = gql`
@@ -7270,6 +7270,7 @@ export const GetUsersDocument = gql`
   users {
     id
     displayName
+    avatarUrl
   }
 }
     `;

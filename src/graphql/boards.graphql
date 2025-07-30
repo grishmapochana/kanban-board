@@ -60,6 +60,7 @@ query GetUsers {
   users {
     id
     displayName
+    avatarUrl
   }
 }
 

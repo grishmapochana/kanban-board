@@ -85,7 +85,7 @@ export function EditCardDialog({
             />
           </SelectTrigger>
           <SelectContent>
-            {usersData?.users.map((u: any) => (
+            {usersData?.users.map((u: User) => (
               <SelectItem key={u.id} value={u.id}>
                 {u.displayName}
               </SelectItem>

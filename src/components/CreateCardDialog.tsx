@@ -19,8 +19,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useCreateCardMutation, GetBoardDocument } from "@/gql/generated";
-import { Plus } from "lucide-react";
-useCreateCardMutation;
 
 export function CreateCardDialog({
   columnId,
@@ -29,7 +27,7 @@ export function CreateCardDialog({
 }: {
   columnId: string;
   boardId: string;
-  columnCards: any;
+  columnCards: Card[];
 }) {
   // 1. Load users
   const {
@@ -91,7 +89,7 @@ export function CreateCardDialog({
             {usersError && (
               <SelectItem value="">Error loading users</SelectItem>
             )}
-            {usersData?.users.map((u: any) => (
+            {usersData?.users.map((u: User) => (
               <SelectItem key={u.id} value={u.id}>
                 {u.displayName}
               </SelectItem>

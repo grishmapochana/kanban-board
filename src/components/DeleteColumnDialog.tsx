@@ -23,7 +23,7 @@ export function DeleteColumnDialog({
   boardId: string;
 }) {
   const [open, setOpen] = useState(false);
-  const [deleteColumn, { loading, error }] = useDeleteColumnMutation({
+  const [deleteColumn, { loading }] = useDeleteColumnMutation({
     refetchQueries: [{ query: GetBoardDocument, variables: { id: boardId } }],
   });
 

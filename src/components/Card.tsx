@@ -2,8 +2,17 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { EditCardDialog } from "./EditCardDailog";
 import { DeleteCardDialog } from "./DeleteCardDialog";
+import Image from "next/image";
 
-export default function Card({ card, isOverlay, boardId }: any) {
+export default function Card({
+  card,
+  isOverlay,
+  boardId,
+}: {
+  card: Card;
+  isOverlay?: boolean;
+  boardId: string;
+}) {
   const {
     attributes,
     listeners,
@@ -37,13 +46,23 @@ export default function Card({ card, isOverlay, boardId }: any) {
         <div className="mt-2 flex items-center justify-between gap-2">
           <div className="flex gap-2 items-center">
             {" "}
-            <img
+            {/* <img
               src={
                 card.user.avatarUrl ||
                 `https://api.dicebear.com/7.x/initials/svg?seed=${card.user.displayName}`
               }
               alt={card.user.displayName}
               className="w-6 h-6 rounded-full"
+            /> */}
+            <Image
+              alt="avatarUrl"
+              src={
+                card.user.avatarUrl ||
+                `https://api.dicebear.com/7.x/initials/svg?seed=${card.user.displayName}`
+              }
+              width={35}
+              height={35}
+              className="rounded-full"
             />
             <span>{card.user.displayName}</span>
           </div>

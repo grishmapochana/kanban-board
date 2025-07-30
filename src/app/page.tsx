@@ -5,7 +5,7 @@ import { useGetBoardsQuery } from "@/gql/generated";
 import { useEffect, useState } from "react";
 
 export default function Home() {
-  const { data, loading, error } = useGetBoardsQuery();
+  const { data } = useGetBoardsQuery();
   const [activeBoardId, setActiveBoardId] = useState<string>("");
 
   // Auto-select first board when loaded

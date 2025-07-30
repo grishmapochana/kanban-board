@@ -1,4 +1,3 @@
-import React, { useId, useMemo } from "react";
 import Card from "./Card";
 import {
   SortableContext,
@@ -10,7 +9,15 @@ import { EditColumnDialog } from "./EditColumnDialog";
 import { DeleteColumnDialog } from "./DeleteColumnDialog";
 import { CreateCardDialog } from "./CreateCardDialog";
 
-function Column({ column, isOverlay, boardId }: any) {
+function Column({
+  column,
+  isOverlay,
+  boardId,
+}: {
+  column: Column;
+  isOverlay?: boolean;
+  boardId: string;
+}) {
   const {
     setNodeRef,
     transform,
@@ -46,7 +53,7 @@ function Column({ column, isOverlay, boardId }: any) {
         <h2 className="font-bold text-xl text-white  flex-1">{column.name}</h2>
         <EditColumnDialog
           columnId={column.id}
-          initialName={column.title}
+          initialName={column.name}
           boardId={boardId}
         />
         <DeleteColumnDialog columnId={column.id} boardId={boardId} />
@@ -57,11 +64,11 @@ function Column({ column, isOverlay, boardId }: any) {
 
       <div className="flex-1">
         <SortableContext
-          items={column.cards.map((c: any) => c.id)}
+          items={column.cards.map((c: Card) => c.id)}
           strategy={verticalListSortingStrategy}
         >
           {column.cards.length > 0 ? (
-            column.cards.map((card: any) => (
+            column.cards.map((card: Card) => (
               <Card key={card.id} card={card} boardId={boardId} />
             ))
           ) : (

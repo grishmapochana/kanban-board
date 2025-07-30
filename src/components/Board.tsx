@@ -7,6 +7,8 @@ import {
   useSensor,
   useSensors,
   DragOverlay,
+  DragStartEvent,
+  DragEndEvent,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -23,11 +25,10 @@ import {
 
 import Column from "./Column";
 import Card from "./Card";
-
 import CreateColumnDialog from "./CreateColumnDialog";
 
 export default function Board({ activeBoardId }: { activeBoardId: string }) {
-  const [columns, setColumns] = useState<any[]>([]);
+  const [columns, setColumns] = useState<Column[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [activeType, setActiveType] = useState<"column" | "card" | null>(null);
   const sensors = useSensors(
@@ -47,12 +48,7 @@ export default function Board({ activeBoardId }: { activeBoardId: string }) {
 
   useEffect(() => {
     if (!isUpdatingRef.current && data?.boards[0]?.columns) {
-      // const dbCols = data.boards[0].columns;
-      // const sameOrder =
-      //   dbCols.map((c: any) => c.id).join(",") ===
-      //   columns.map((c: any) => c.id).join(",");
-      // if (!sameOrder) setColumns(dbCols);
-      setColumns(data?.boards[0]?.columns);
+      setColumns(data.boards[0].columns);
     }
   }, [data]);
 
@@ -60,14 +56,14 @@ export default function Board({ activeBoardId }: { activeBoardId: string }) {
   if (error) return <p>{error.message}</p>;
   if (!data?.boards[0]) return <p>No board found</p>;
 
-  const handleDragStart = (event: any) => {
+  const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
     const isColumn = columns.some((col) => col.id === active.id);
     const isCard = columns.some((col) =>
-      col.cards.some((card: any) => card.id === active.id)
+      col.cards.some((card: Card) => card.id === active.id)
     );
     setActiveType(isColumn ? "column" : isCard ? "card" : null);
-    setActiveId(active.id);
+    setActiveId(String(active.id));
   };
 
   function reorder<T>(list: T[], startIndex: number, endIndex: number): T[] {
@@ -77,7 +73,7 @@ export default function Board({ activeBoardId }: { activeBoardId: string }) {
     return result;
   }
 
-  const handleDragEnd = async (event: any) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
@@ -110,21 +106,21 @@ export default function Board({ activeBoardId }: { activeBoardId: string }) {
     if (activeType === "card") {
       const newCols = [...columns];
       const sourceCol = newCols.find((col) =>
-        col.cards.some((card: any) => card.id === active.id)
+        col.cards.some((card: Card) => card.id === active.id)
       );
       let destCol = newCols.find((col) =>
-        col.cards.some((card: any) => card.id === over.id)
+        col.cards.some((card: Card) => card.id === over.id)
       );
       if (!destCol) destCol = newCols.find((col) => col.id === over.id);
       if (!sourceCol || !destCol) return;
 
       if (sourceCol.id === destCol.id) {
-        const reorderCards = reorder(
+        const reorderCards: Card[] = reorder(
           sourceCol.cards,
-          active.data.current.sortable.index,
-          over.data.current.sortable.index
+          active.data.current && active.data.current.sortable.index,
+          over.data.current && over.data.current.sortable.index
         );
-        const updated = reorderCards.map((card: any, idx) => ({
+        const updated = reorderCards.map((card, idx) => ({
           ...card,
           position: idx,
         }));
@@ -153,15 +149,22 @@ export default function Board({ activeBoardId }: { activeBoardId: string }) {
           )
         );
       } else {
+        if (!sourceCol || !destCol) return;
+
         const sourceCards = [...sourceCol.cards];
         const destCards = [...destCol.cards];
+
         const [movedCard] = sourceCards.splice(
-          active.data.current.sortable.index,
+          active.data.current && active.data.current.sortable.index,
           1
         );
-        destCards.splice(over.data.current.sortable.index, 0, {
-          ...movedCard,
-        });
+        destCards.splice(
+          over.data.current && over.data.current.sortable.index,
+          0,
+          {
+            ...movedCard,
+          }
+        );
 
         const updatedSrc = sourceCards.map((card, idx) => ({
           ...card,
@@ -174,7 +177,7 @@ export default function Board({ activeBoardId }: { activeBoardId: string }) {
 
         const updatedCols = newCols.map((col) => {
           if (col.id === sourceCol.id) return { ...col, cards: updatedSrc };
-          if (col.id === destCol.id) return { ...col, cards: updatedDst };
+          if (col.id === destCol?.id) return { ...col, cards: updatedDst };
           return col;
         });
 
@@ -202,13 +205,13 @@ export default function Board({ activeBoardId }: { activeBoardId: string }) {
             updateCardPosition({
               variables: {
                 id: card.id,
-                column_id: destCol.id,
+                column_id: destCol?.id,
                 position: card.position,
               },
               optimisticResponse: {
                 update_cards_by_pk: {
                   id: card.id,
-                  column_id: destCol.id,
+                  column_id: destCol?.id,
                   position: card.position,
                   __typename: "cards",
                 },
@@ -261,7 +264,10 @@ export default function Board({ activeBoardId }: { activeBoardId: string }) {
       <DragOverlay>
         {activeId && activeType === "column" && (
           <Column
-            column={columns.find((col) => col.id === activeId)}
+            boardId={activeBoardId}
+            column={
+              columns.find((col: Column) => col.id == activeId) || columns[0]
+            }
             isOverlay
           />
         )}
@@ -271,7 +277,9 @@ export default function Board({ activeBoardId }: { activeBoardId: string }) {
             const card = columns
               .flatMap((col) => col.cards)
               .find((card) => card.id === activeId);
-            return card ? <Card card={card} isOverlay /> : null;
+            return card ? (
+              <Card card={card} isOverlay boardId={activeBoardId} />
+            ) : null;
           })()}
       </DragOverlay>
     </DndContext>
