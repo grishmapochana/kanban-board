@@ -1,0 +1,113 @@
+query GetBoards {
+  boards {
+    id
+    name
+  }
+}
+
+query GetBoard($id: uuid!) {
+  boards(where: { id: { _eq: $id } }) {
+    id
+    name
+    columns(order_by: { position: asc }) {
+      id
+      name
+      position
+      cards(order_by: { position: asc }) {
+        id
+        name
+        position
+        user {
+          id
+          displayName
+          avatarUrl
+        }
+      }
+    }
+  }
+}
+
+mutation AddColumn($board_id: uuid!, $name: String!, $position: float8!) {
+  insert_columns_one(
+    object: { board_id: $board_id, name: $name, position: $position }
+  ) {
+    id
+    name
+    position
+  }
+}
+
+mutation UpdateColumn($id: uuid!, $name: String!) {
+  update_columns_by_pk(pk_columns: { id: $id }, _set: { name: $name }) {
+    id
+    name
+  }
+}
+mutation DeleteColumn($id: uuid!) {
+  delete_columns_by_pk(id: $id) {
+    id
+  }
+}
+
+mutation UpdateColumnPosition($id: uuid!, $position: float8!) {
+  update_columns_by_pk(pk_columns: { id: $id }, _set: { position: $position }) {
+    id
+    position
+  }
+}
+
+query GetUsers {
+  users {
+    id
+    displayName
+  }
+}
+
+mutation CreateCard(
+  $columnId: uuid!
+  $name: String!
+  $userId: uuid!
+  $position: float8!
+) {
+  insert_cards_one(
+    object: {
+      column_id: $columnId
+      name: $name
+      user_id: $userId
+      position: $position
+    }
+  ) {
+    id
+    name
+    position
+    user_id
+  }
+}
+
+mutation UpdateCardPosition($id: uuid!, $position: float8!, $column_id: uuid!) {
+  update_cards_by_pk(
+    pk_columns: { id: $id }
+    _set: { position: $position, column_id: $column_id }
+  ) {
+    id
+    position
+    column_id
+  }
+}
+
+mutation UpdateCard($id: uuid!, $name: String!, $userId: uuid!) {
+  update_cards_by_pk(
+    pk_columns: { id: $id }
+    _set: { name: $name, user_id: $userId }
+  ) {
+    id
+    name
+    user_id
+  }
+}
+
+mutation DeleteCard($id: uuid!) {
+  delete_cards_by_pk(id: $id) {
+    id
+  }
+}

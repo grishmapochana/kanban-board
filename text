@@ -1,0 +1,272 @@
+//old version
+const handleDragEnd = (event: any) => {
+const { active, over } = event;
+if (!over) return;
+
+    if (active.id === over.id) return;
+
+    const oldIndex = columns.findIndex((col) => col.id === active.id);
+    const newIndex = columns.findIndex((col) => col.id === over.id);
+
+    if (oldIndex !== -1 && newIndex !== -1) {
+      setColumns(arrayMove(columns, oldIndex, newIndex));
+    }
+
+};
+
+const handleCardDragEnd = (event: any) => {
+const { active, over } = event;
+if (!over || active.id === over.id) return;
+
+    const oldColumnIndex = columns.findIndex((col) =>
+      col.cards.some((card: any) => card.id === active.id)
+    );
+
+    // 🔑 1️⃣ Try to find target col by card id
+    let newColumnIndex = columns.findIndex((col) =>
+      col.cards.some((card: any) => card.id === over.id)
+    );
+
+    // 🔑 2️⃣ If not found, maybe it's an empty placeholder
+    if (newColumnIndex === -1) {
+      newColumnIndex = columns.findIndex(
+        (col) => `empty-${col.id}` === over.id
+      );
+    }
+
+    if (oldColumnIndex === -1 || newColumnIndex === -1) return;
+
+    const oldCards = [...columns[oldColumnIndex].cards];
+    const newCards =
+      oldColumnIndex === newColumnIndex
+        ? oldCards
+        : [...columns[newColumnIndex].cards];
+
+    const draggedCardIndex = oldCards.findIndex(
+      (card) => card.id === active.id
+    );
+
+    let targetCardIndex = newCards.findIndex((card) => card.id === over.id);
+
+    if (targetCardIndex === -1) {
+      // Dropping onto empty column → push at end
+      targetCardIndex = newCards.length;
+    }
+
+    const [movedCard] = oldCards.splice(draggedCardIndex, 1);
+
+    if (oldColumnIndex === newColumnIndex) {
+      oldCards.splice(targetCardIndex, 0, movedCard);
+
+      const newCols = columns.map((col, idx) =>
+        idx === oldColumnIndex ? { ...col, cards: oldCards } : col
+      );
+      setColumns(newCols);
+    } else {
+      newCards.splice(targetCardIndex, 0, movedCard);
+
+      const newCols = columns.map((col, idx) => {
+        if (idx === oldColumnIndex) {
+          return { ...col, cards: oldCards };
+        } else if (idx === newColumnIndex) {
+          return { ...col, cards: newCards };
+        } else {
+          return col;
+        }
+      });
+
+      setColumns(newCols);
+    }
+
+};
+
+//new version
+// const handleDragEnd = (event: any) => {
+  //   const { active, over } = event;
+  //   if (!over) return;
+  //   if (active.id === over.id) return;
+
+  //   const oldIndex = columns.findIndex((col) => col.id === active.id);
+  //   const newIndex = columns.findIndex((col) => col.id === over.id);
+
+  //   if (oldIndex === -1 || newIndex === -1) return;
+
+  //   const newCols = arrayMove(columns, oldIndex, newIndex);
+
+  //   // ✅ Compute new position for dragged column
+  //   const prev = newCols[newIndex - 1];
+  //   const next = newCols[newIndex + 1];
+
+  //   let newPosition = 0;
+  //   if (!prev) {
+  //     newPosition = next ? next.position - 1 : 0;
+  //   } else if (!next) {
+  //     newPosition = prev.position + 1;
+  //   } else {
+  //     newPosition = (prev.position + next.position) / 2;
+  //   }
+
+  //   newCols[newIndex].position = newPosition;
+
+  //   setColumns(newCols);
+
+  //   updateColumnPosition({
+  //     variables: {
+  //       id: newCols[newIndex].id,
+  //       position: newPosition,
+  //     },
+  //   });
+  // };
+
+  // const handleCardDragEnd = (event: any) => {
+  //   const { active, over } = event;
+  //   if (!over || active.id === over.id) return;
+
+  //   // 🧠 Find source and destination columns
+  //   const oldColumnIndex = columns.findIndex((col) =>
+  //     col.cards.some((card) => card.id === active.id)
+  //   );
+
+  //   let newColumnIndex = columns.findIndex((col) =>
+  //     col.cards.some((card) => card.id === over.id)
+  //   );
+
+  //   // 🧠 Check for empty-column placeholder drop
+  //   if (newColumnIndex === -1) {
+  //     newColumnIndex = columns.findIndex(
+  //       (col) => `empty-${col.id}` === over.id
+  //     );
+  //   }
+
+  //   if (oldColumnIndex === -1 || newColumnIndex === -1) return;
+
+  //   // ✅ Clone arrays safely (no mutation!)
+  //   const oldCards = [...columns[oldColumnIndex].cards];
+  //   const newCards =
+  //     oldColumnIndex === newColumnIndex
+  //       ? [...oldCards]
+  //       : [...columns[newColumnIndex].cards];
+
+  //   const draggedCardIndex = oldCards.findIndex(
+  //     (card) => card.id === active.id
+  //   );
+  //   let targetCardIndex = newCards.findIndex((card) => card.id === over.id);
+
+  //   // ✅ Handle drop onto empty column
+  //   if (targetCardIndex === -1) {
+  //     targetCardIndex = newCards.length;
+  //   }
+
+  //   const [rawCard] = oldCards.splice(draggedCardIndex, 1);
+  //   const movedCard = { ...rawCard };
+
+  //   newCards.splice(targetCardIndex, 0, movedCard);
+
+  //   // ✅ Calculate new position float
+  //   const prev = newCards[targetCardIndex - 1];
+  //   const next = newCards[targetCardIndex + 1];
+
+  //   let newPosition = 0;
+  //   if (!prev) {
+  //     newPosition = next ? next.position - 1 : 0;
+  //   } else if (!next) {
+  //     newPosition = prev.position + 1;
+  //   } else {
+  //     newPosition = (prev.position + next.position) / 2;
+  //   }
+
+  //   movedCard.position = parseFloat(newPosition.toFixed(6)); // 🔑 Clamp precision
+  //   movedCard.column_id = columns[newColumnIndex].id;
+
+  //   // ✅ Update state
+  //   const newCols = columns.map((col, idx) => {
+  //     if (idx === oldColumnIndex) {
+  //       return { ...col, cards: oldCards };
+  //     } else if (idx === newColumnIndex) {
+  //       return { ...col, cards: newCards };
+  //     }
+  //     return col;
+  //   });
+
+  //   setTimeout(() => {
+  //     setColumns([...newCols]);
+  //   }, 0);
+
+  //   // ✅ Trigger mutation
+  //   updateCardPosition({
+  //     variables: {
+  //       id: movedCard.id,
+  //       column_id: movedCard.column_id,
+  //       position: movedCard.position,
+  //     },
+  //     refetchQueries: [
+  //       { query: GetBoardDocument, variables: { id: activeBoardId } },
+  //     ],
+  //   });
+  // };
+
+   const handleCardDragEnd = (event: any) => {
+    console.log("hi");
+    const { active, over } = event;
+    console.log({ event });
+    if (!over || active.id === over.id) return;
+
+    const oldColumnIndex = columns.findIndex((col) =>
+      col.cards.some((card: any) => card.id === active.id)
+    );
+
+    let newColumnIndex = columns.findIndex((col) =>
+      col.cards.some((card: any) => card.id === over.id)
+    );
+
+    // 🔑 2️⃣ If not found, maybe it's an empty placeholder
+    if (newColumnIndex === -1) {
+      newColumnIndex = columns.findIndex(
+        (col) => `empty-${col.id}` === over.id
+      );
+    }
+
+    if (oldColumnIndex === -1 || newColumnIndex === -1) return;
+
+    const oldCards = [...columns[oldColumnIndex].cards];
+    const newCards =
+      oldColumnIndex === newColumnIndex
+        ? oldCards
+        : [...columns[newColumnIndex].cards];
+
+    const draggedCardIndex = oldCards.findIndex(
+      (card) => card.id === active.id
+    );
+
+    let targetCardIndex = newCards.findIndex((card) => card.id === over.id);
+
+    if (targetCardIndex === -1) {
+      // Dropping onto empty column → push at end
+      targetCardIndex = newCards.length;
+    }
+
+    const [movedCard] = oldCards.splice(draggedCardIndex, 1);
+
+    if (oldColumnIndex === newColumnIndex) {
+      oldCards.splice(targetCardIndex, 0, movedCard);
+
+      const newCols = columns.map((col, idx) =>
+        idx === oldColumnIndex ? { ...col, cards: oldCards } : col
+      );
+      setColumns(newCols);
+    } else {
+      newCards.splice(targetCardIndex, 0, movedCard);
+
+      const newCols = columns.map((col, idx) => {
+        if (idx === oldColumnIndex) {
+          return { ...col, cards: oldCards };
+        } else if (idx === newColumnIndex) {
+          return { ...col, cards: newCards };
+        } else {
+          return col;
+        }
+      });
+
+      setColumns(newCols);
+    }
+  };
